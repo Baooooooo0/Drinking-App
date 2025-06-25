@@ -7,9 +7,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.coffeeapp.model.CartRepository
 import com.example.coffeeapp.model.CartViewModel
 
 class MainActivity : ComponentActivity() {
@@ -26,13 +27,10 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun AppContent() {
-    val cartViewModel: CartViewModel = viewModel()
     val context = LocalContext.current
-
-    LaunchedEffect(context) {
-        cartViewModel.init(context)
-    }
+    val cartRepository = remember(context) { CartRepository(context) }
+    val cartViewModel: CartViewModel = viewModel(factory = CartViewModel.provideFactory(cartRepository))
 
     // DrinkListScreen()
-    AppNavigation()
+    AppNavigation(cartViewModel)
 }

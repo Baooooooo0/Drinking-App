@@ -5,13 +5,14 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class CartViewModel : ViewModel() {
+class CartViewModel(private val repository: CartRepository) : ViewModel() {
     var cartItems = mutableStateListOf<CartItem>()
         private set
 
@@ -24,10 +25,7 @@ class CartViewModel : ViewModel() {
     private val _totalPrice = mutableStateOf(0.0)
     val totalPrice get() = _totalPrice.value
 
-    private lateinit var sharedPreferences: SharedPreferences
-
-    fun init(context: Context) {
-        sharedPreferences = context.getSharedPreferences("cart_prefs", Context.MODE_PRIVATE)
+    init {
         loadCart()
         loadPurchaseHistory()
     }
@@ -35,12 +33,10 @@ class CartViewModel : ViewModel() {
     fun addToCart(item: CartItem) {
         val existingIndex = cartItems.indexOfFirst { it.name == item.name }
         if (existingIndex != -1) {
-            // Cập nhật quantity của item đã tồn tại
             cartItems[existingIndex] = cartItems[existingIndex].copy(
                 quantity = cartItems[existingIndex].quantity + 1
             )
         } else {
-            // Thêm item mới
             cartItems.add(item.copy())
         }
         recalculateTotal()
@@ -120,62 +116,29 @@ class CartViewModel : ViewModel() {
 
     private fun recalculateTotal() {
         _totalPrice.value = cartItems.sumOf { it.price * it.quantity }
-        // Debug log để kiểm tra
-        println("Debug - Recalculating total: ${_totalPrice.value}")
-        cartItems.forEach { item ->
-            println("Debug - Item: ${item.name}, Price: ${item.price}, Quantity: ${item.quantity}, Subtotal: ${item.price * item.quantity}")
-        }
     }
 
     private fun saveCart() {
-        if (::sharedPreferences.isInitialized) {
-            val editor = sharedPreferences.edit()
-            val gson = Gson()
-            val json = gson.toJson(cartItems)
-            editor.putString("cart_items", json)
-            editor.apply()
-        }
+        repository.saveCart(cartItems)
     }
 
     private fun loadCart() {
-        if (::sharedPreferences.isInitialized) {
-            val gson = Gson()
-            val json = sharedPreferences.getString("cart_items", null)
-            val type = object : TypeToken<List<CartItem>>() {}.type
-            val items: List<CartItem>? = gson.fromJson(json, type)
-            items?.let {
-                cartItems.addAll(it)
-                recalculateTotal()
-            }
-        }
+        val items = repository.loadCart()
+        cartItems.clear()
+        cartItems.addAll(items)
+        recalculateTotal()
     }
 
     private fun savePurchaseHistory() {
-        if (::sharedPreferences.isInitialized) {
-            val gson = Gson()
-            sharedPreferences.edit().apply {
-                putString("purchase_history", gson.toJson(purchaseHistory))
-                putString("purchase_timestamps", gson.toJson(purchaseTimestamps))
-            }.apply()
-        }
+        repository.savePurchaseHistory(purchaseHistory, purchaseTimestamps)
     }
 
     private fun loadPurchaseHistory() {
-        if (::sharedPreferences.isInitialized) {
-            val gson = Gson()
-
-            sharedPreferences.getString("purchase_history", null)?.let { json ->
-                val type = object : TypeToken<List<List<CartItem>>>() {}.type
-                val history = gson.fromJson<List<List<CartItem>>>(json, type)
-                purchaseHistory.addAll(history)
-            }
-
-            sharedPreferences.getString("purchase_timestamps", null)?.let { json ->
-                val type = object : TypeToken<List<String>>() {}.type
-                val timestamps = gson.fromJson<List<String>>(json, type)
-                purchaseTimestamps.addAll(timestamps)
-            }
-        }
+        val (history, timestamps) = repository.loadPurchaseHistory()
+        purchaseHistory.clear()
+        purchaseTimestamps.clear()
+        purchaseHistory.addAll(history)
+        purchaseTimestamps.addAll(timestamps)
     }
 
     private fun getCurrentTimestamp(): String {
@@ -186,6 +149,20 @@ class CartViewModel : ViewModel() {
     fun clearPurchaseHistory() {
         purchaseHistory.clear()
         purchaseTimestamps.clear()
+        savePurchaseHistory()
+    }
+
+    companion object {
+        fun provideFactory(repository: CartRepository): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    if (modelClass.isAssignableFrom(CartViewModel::class.java)) {
+                        @Suppress("UNCHECKED_CAST")
+                        return CartViewModel(repository) as T
+                    }
+                    throw IllegalArgumentException("Unknown ViewModel class")
+                }
+            }
     }
 }
 

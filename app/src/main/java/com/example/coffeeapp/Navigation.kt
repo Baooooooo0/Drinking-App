@@ -23,9 +23,8 @@ import com.example.coffeeapp.model.CartViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun AppNavigation() {
+fun AppNavigation(cartViewModel: CartViewModel) {
     val navController = rememberNavController()
-    val cartViewModel: CartViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "Login") {
         composable("Login") { LoginScreen(navController) }
