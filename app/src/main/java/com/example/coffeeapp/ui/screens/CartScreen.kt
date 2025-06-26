@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.coffeeapp.model.CartItem
-import com.example.coffeeapp.recycle.HeaderScreen
 import com.example.coffeeapp.model.CartViewModel
+import com.example.coffeeapp.recycle.HeaderScreen
 import kotlinx.coroutines.launch
 
 // Optimized color definitions
@@ -93,7 +93,7 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel) {
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = "${"%,.0f".format(totalPrice)} $",
+                                text = "$${"%,.2f".format(totalPrice)}",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TextPrimary
@@ -219,14 +219,20 @@ fun CartItemRow(
                     fontWeight = FontWeight.SemiBold,
                     color = TextPrimary
                 )
+                Text(
+                    text = "Size: ${item.size}",
+                    fontSize = 12.sp,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "${"%,.0f".format(item.price)} $/item",
+                    text = "$${"%,.2f".format(item.price)}/item",
                     fontSize = 14.sp,
                     color = TextSecondary
                 )
                 Text(
-                    text = "Total: ${"%,.0f".format(item.price * item.quantity)} $",
+                    text = "Total: $${"%,.2f".format(item.price * item.quantity)}",
                     fontSize = 14.sp,
                     color = TextSuccess,
                     fontWeight = FontWeight.Medium

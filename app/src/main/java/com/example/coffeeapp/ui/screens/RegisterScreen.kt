@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import com.example.coffeeapp.sign_in.AuthViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     navController: NavController,

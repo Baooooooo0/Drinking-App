@@ -193,11 +193,14 @@ fun DrinkDetailScreen(drinkId: String, navController: NavController, cartViewMod
                                 name = drink?.title ?: "",
                                 price = (drink?.price ?: 0.0),
                                 quantity = 1,
-                                imageRes = R.drawable.ice_drink
+                                imageRes = R.drawable.ice_drink,
+                                size = selectedSize // Thêm size đã chọn
                             )
 
-                            // Kiểm tra xem sản phẩm đã có trong giỏ chưa
-                            val existingItem = cartViewModel.cartItems.find { it.name == newItem.name }
+                            // Kiểm tra xem sản phẩm cùng tên và cùng size đã có trong giỏ chưa
+                            val existingItem = cartViewModel.cartItems.find {
+                                it.name == newItem.name && it.size == newItem.size
+                            }
                             if (existingItem != null) {
                                 // Cập nhật số lượng thay vì tạo mục mới
                                 cartViewModel.updateItemQuantity(existingItem, existingItem.quantity + 1)

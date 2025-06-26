@@ -68,7 +68,8 @@ dependencies {
 
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx) // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.coroutines.android) // Coroutines
     implementation(libs.okhttp.logging) // OkHttp Logging Interceptor}
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
