@@ -20,6 +20,7 @@ import com.example.coffeeapp.ui.screens.ProfileScreen
 import com.example.coffeeapp.ui.screens.RegisterScreen
 import com.example.coffeeapp.ui.screens.SplashScreen
 import com.example.coffeeapp.model.CartViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -31,7 +32,10 @@ fun AppNavigation(cartViewModel: CartViewModel) {
         composable("Register") { RegisterScreen(navController) }
         composable("Profile") { ProfileScreen(navController)}
         composable("Splash") { SplashScreen(navController)}
-        composable("Menu") { MenuScreen(navController)}
+        composable("Menu") { 
+            val user = FirebaseAuth.getInstance().currentUser
+            MenuScreen(navController, user)
+        }
         composable("Favourite") { FavouriteScreen(navController)}
         composable("Cart") { CartScreen(navController, cartViewModel) }
         composable("History") { HistoryScreen(navController, cartViewModel)}

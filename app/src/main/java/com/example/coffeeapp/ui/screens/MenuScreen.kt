@@ -26,13 +26,16 @@ import androidx.navigation.NavHostController
 import com.example.coffeeapp.R
 import com.example.coffeeapp.recycle.FooterMenu
 import com.example.coffeeapp.ui.SetStatusBarIconsLight
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun MenuScreen(navHostController: NavHostController) {
-    val user = FirebaseAuth.getInstance().currentUser
+fun MenuScreen(navHostController: NavHostController, user: FirebaseUser?) {
     SetStatusBarIconsLight(isLightIcons = true)
+    val welcomeText = if (user?.displayName.isNullOrBlank()) {
+        "Welcome!"
+    } else {
+        "Welcome\n${user.displayName}"
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -52,7 +55,7 @@ fun MenuScreen(navHostController: NavHostController) {
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Welcome\n ${user?.displayName}",
+                text = welcomeText,
                 fontSize = 42.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
