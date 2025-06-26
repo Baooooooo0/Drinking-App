@@ -33,14 +33,12 @@ class CartViewModel : ViewModel() {
     }
 
     fun addToCart(item: CartItem) {
-        val existingIndex = cartItems.indexOfFirst { it.name == item.name }
+        val existingIndex = cartItems.indexOfFirst { it.name == item.name && it.size == item.size }
         if (existingIndex != -1) {
-            // Cập nhật quantity của item đã tồn tại
             cartItems[existingIndex] = cartItems[existingIndex].copy(
                 quantity = cartItems[existingIndex].quantity + 1
             )
         } else {
-            // Thêm item mới
             cartItems.add(item.copy())
         }
         recalculateTotal()
@@ -49,7 +47,7 @@ class CartViewModel : ViewModel() {
 
     fun removeFromCart(item: CartItem) {
         val index = cartItems.indexOfFirst {
-            it.name == item.name && it.price == item.price
+            it.name == item.name && it.price == item.price && it.size == item.size
         }
         if (index != -1) {
             cartItems.removeAt(index)
@@ -59,8 +57,9 @@ class CartViewModel : ViewModel() {
     }
 
     fun increaseQuantity(item: CartItem) {
+        // SỬA LẠI LOGIC TÌM KIẾM
         val index = cartItems.indexOfFirst {
-            it.name == item.name && it.price == item.price
+            it.name == item.name && it.price == item.price && it.size == item.size
         }
         if (index != -1) {
             cartItems[index] = cartItems[index].copy(
@@ -72,8 +71,9 @@ class CartViewModel : ViewModel() {
     }
 
     fun decreaseQuantity(item: CartItem) {
+        // SỬA LẠI LOGIC TÌM KIẾM
         val index = cartItems.indexOfFirst {
-            it.name == item.name && it.price == item.price
+            it.name == item.name && it.price == item.price && it.size == item.size
         }
         if (index != -1 && cartItems[index].quantity > 1) {
             cartItems[index] = cartItems[index].copy(
@@ -85,8 +85,9 @@ class CartViewModel : ViewModel() {
     }
 
     fun updateItemQuantity(item: CartItem, newQuantity: Int) {
+        // SỬA LẠI LOGIC TÌM KIẾM
         val index = cartItems.indexOfFirst {
-            it.name == item.name && it.price == item.price
+            it.name == item.name && it.price == item.price && it.size == item.size
         }
         if (index != -1) {
             cartItems[index] = cartItems[index].copy(quantity = newQuantity)
@@ -120,7 +121,6 @@ class CartViewModel : ViewModel() {
 
     private fun recalculateTotal() {
         _totalPrice.value = cartItems.sumOf { it.price * it.quantity }
-        // Debug log để kiểm tra
         println("Debug - Recalculating total: ${_totalPrice.value}")
         cartItems.forEach { item ->
             println("Debug - Item: ${item.name}, Price: ${item.price}, Quantity: ${item.quantity}, Subtotal: ${item.price * item.quantity}")
@@ -188,4 +188,3 @@ class CartViewModel : ViewModel() {
         purchaseTimestamps.clear()
     }
 }
-
