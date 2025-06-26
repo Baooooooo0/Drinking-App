@@ -15,11 +15,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -33,6 +46,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -47,6 +62,15 @@ import androidx.navigation.NavController
 import com.example.coffeeapp.R
 import com.example.coffeeapp.sign_in.AuthViewModel
 import kotlinx.coroutines.launch
+
+// Professional Color Scheme
+private val CoffeePrimary = Color(0xFF8B4513)
+private val CoffeeSecondary = Color(0xFFD2691E)
+private val CoffeeAccent = Color(0xFFDEB887)
+private val BackgroundGradientStart = Color(0xFFFAF6F0)
+private val BackgroundGradientEnd = Color(0xFFF5F0E8)
+private val TextPrimary = Color(0xFF2C1810)
+private val TextSecondary = Color(0xFF6B4226)
 
 @Composable
 fun LoginScreen(
@@ -65,7 +89,6 @@ fun LoginScreen(
 
     LaunchedEffect(user) {
         user?.let {
-            // Đảm bảo chỉ thực hiện nếu user không phải là null
             onSignInSuccess()
             navController.navigate("Splash") {
                 popUpTo("Login") { inclusive = true }
@@ -87,19 +110,36 @@ fun LoginScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(BackgroundGradientStart, BackgroundGradientEnd)
+                    )
+                )
                 .padding(padding),
             contentAlignment = Alignment.Center
         ) {
             if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(50.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White.copy(alpha = 0.9f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(40.dp),
+                        color = CoffeePrimary,
+                        strokeWidth = 4.dp
+                    )
+                }
             } else {
                 Column(
                     modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
                     SignInContent(
                         navController = navController,
@@ -128,114 +168,202 @@ private fun SignInContent(
     var password by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    Card(
         modifier = Modifier
-            .fillMaxHeight()
-            .background(color = Color.White)
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
     ) {
-        Text(
-            text = "Coffee App",
-            fontWeight = FontWeight.Bold,
-            fontSize = 35.sp,
-            color = Color(0xFF2196F3),
-            modifier = Modifier.padding(top = 80.dp)
-        )
-
-        Text(
-            text = "Coffee for you",
-            color = Color(0xFF2196F3),
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                coroutineScope.launch {
-                    viewModel.signInWithEmail(email, password)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            // Header Section
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Coffee Icon or Logo placeholder
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(
+                            brush = Brush.radialGradient(
+                                colors = listOf(CoffeePrimary, CoffeeSecondary)
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "☕",
+                        fontSize = 40.sp,
+                        color = Color.White
+                    )
                 }
-            },
-            enabled = !isLoading,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF42A5F5),
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text(text = "LOGIN")
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = { navController.navigate("Register") },
-            enabled = !isLoading,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray,
-                contentColor = Color.Black
-            ),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text(text = "Don't have an account? Register")
-        }
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Text(
-            text = "OR",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        Button(
-            onClick = onSignInClick,
-            enabled = !isLoading,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFD5EDFF),
-                contentColor = Color(0xFF130160)
-            ),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.icon_google),
-                    contentDescription = "Google Icon",
-                    modifier = Modifier.size(24.dp)
+                Text(
+                    text = "Coffee House",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary,
+                    textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Sign In with Google")
+
+                Text(
+                    text = "Premium coffee experience",
+                    fontSize = 16.sp,
+                    color = TextSecondary,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            // Form Section
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email Address") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Email,
+                            contentDescription = "Email",
+                            tint = CoffeePrimary
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = CoffeePrimary,
+                        focusedLabelColor = CoffeePrimary,
+                        cursorColor = CoffeePrimary
+                    ),
+                    singleLine = true
+                )
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "Password",
+                            tint = CoffeePrimary
+                        )
+                    },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = CoffeePrimary,
+                        focusedLabelColor = CoffeePrimary,
+                        cursorColor = CoffeePrimary
+                    ),
+                    singleLine = true
+                )
+            }
+
+            // Login Button
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        viewModel.signInWithEmail(email, password)
+                    }
+                },
+                enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = CoffeePrimary,
+                    contentColor = Color.White,
+                    disabledContainerColor = CoffeePrimary.copy(alpha = 0.6f)
+                ),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Text(
+                    text = "Sign In",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            // Register Button
+            OutlinedButton(
+                onClick = { navController.navigate("Register") },
+                enabled = !isLoading,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = CoffeePrimary
+                ),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Text(
+                    text = "Create New Account",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            // Divider
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = Color.Gray.copy(alpha = 0.3f)
+                )
+                Text(
+                    text = "OR",
+                    fontSize = 14.sp,
+                    color = TextSecondary,
+                    fontWeight = FontWeight.Medium
+                )
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = Color.Gray.copy(alpha = 0.3f)
+                )
+            }
+
+            // Google Sign In Button
+            OutlinedButton(
+                onClick = onSignInClick,
+                enabled = !isLoading,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = TextPrimary,
+                    containerColor = Color.White
+                ),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.icon_google),
+                        contentDescription = "Google Icon",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "Continue with Google",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }
