@@ -219,6 +219,12 @@ fun CartItemRow(
                     fontWeight = FontWeight.SemiBold,
                     color = TextPrimary
                 )
+                Text(
+                    text = "Size: ${item.size}",
+                    fontSize = 12.sp,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = "$${"%,.2f".format(item.price)}/item",

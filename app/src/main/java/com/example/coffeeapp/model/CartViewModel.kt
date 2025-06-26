@@ -1,3 +1,4 @@
+// Trong file app/src/main/java/com/example/coffeeapp/model/CartViewModel.kt
 package com.example.coffeeapp.model
 
 import android.content.Context
@@ -33,6 +34,7 @@ class CartViewModel : ViewModel() {
     }
 
     fun addToCart(item: CartItem) {
+        // SỬA LẠI LOGIC KIỂM TRA: Thêm điều kiện `it.size == item.size`
         val existingIndex = cartItems.indexOfFirst { it.name == item.name && it.size == item.size }
         if (existingIndex != -1) {
             cartItems[existingIndex] = cartItems[existingIndex].copy(
@@ -46,6 +48,7 @@ class CartViewModel : ViewModel() {
     }
 
     fun removeFromCart(item: CartItem) {
+        // SỬA LẠI LOGIC TÌM KIẾM
         val index = cartItems.indexOfFirst {
             it.name == item.name && it.price == item.price && it.size == item.size
         }
@@ -91,14 +94,6 @@ class CartViewModel : ViewModel() {
         }
         if (index != -1) {
             cartItems[index] = cartItems[index].copy(quantity = newQuantity)
-            recalculateTotal()
-            saveCart()
-        }
-    }
-
-    fun removeItem(index: Int) {
-        if (index in cartItems.indices) {
-            cartItems.removeAt(index)
             recalculateTotal()
             saveCart()
         }
